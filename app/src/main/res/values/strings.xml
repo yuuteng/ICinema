@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ICinema</string>
+    <string name="openDrawer">open</string>
+    <string name="closeDrawer">close</string>
+</resources>

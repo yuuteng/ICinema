@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--NavigationView的header文件-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="192dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_view_nav_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/nav_icon"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        app:civ_border_color="@color/white"
+        app:civ_border_width="2dp"/>
+    <TextView
+        android:id="@+id/tv_view_nav_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_view_nav_image"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Passoire"/>
+    <TextView
+        android:id="@+id/tv_view_nav_intro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_view_nav_name"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:text="Je suis beau comme le soleil"/>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_view_nav_edit"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_create"
+        app:civ_border_color="@color/white"
+        app:civ_border_width="2dp" />
+</RelativeLayout>
