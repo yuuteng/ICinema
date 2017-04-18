@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,16 +69,22 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
         this.mData = data;
         this.isComingFilm = isComingFilm;
     }
-    //-----未用到-----------------------------------------------------------------------------
-//    @Override
-//    public int getItemViewType(int position) {
-//        if (position == mData.size()) {
-//            return TYPE_FOOT;
-//        } else {
-//            return TYPE_ITEM;
-//        }
-//    }
-    //-----未用到-----------------------------------------------------------------------------
+    public SimpleSubjectAdapter(Context context, List<SimpleSubjectBean> data) {
+        this(context, data, false);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == mData.size()) {
+            //第一次只初始化,不加载数据
+            //TYPE_FOOT-> isLoadCompleted->FOOT_COMPLETED
+            //滑动到底部
+            return TYPE_FOOT;
+        } else {
+            return TYPE_ITEM;
+        }
+    }
+
     /**
      * 用于加载数据时的url起点
      */
@@ -277,10 +284,14 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             }
         }
         public void update() {
-            if (isLoadCompleted())
+            if (isLoadCompleted()){
                 setFootView(FOOT_COMPLETED);
-            else
+            }
+
+            else{
                 setFootView(FOOT_LOADING);
+            }
+
         }
         @Override
         public void onClick(View view) {

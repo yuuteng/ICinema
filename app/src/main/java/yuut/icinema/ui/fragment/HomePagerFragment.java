@@ -1,5 +1,7 @@
 package yuut.icinema.ui.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,12 +142,12 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
             }
 
     }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        MyApplication.removeRequest(VOLLEY_TAG + mTitlePos);
-//    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MyApplication.removeRequest(VOLLEY_TAG + mTitlePos);
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -161,7 +164,7 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
                 initSimpleRecyclerView(true);
                 break;
             case POS_US_BOX:
-                initBoxRecyclerView();
+                //initBoxRecyclerView();
                 break;
             default:
         }
@@ -193,17 +196,17 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
         inManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecView.setLayoutManager(inManager);
 
-        //请求网络数据前先加载  上次的电影数据
+            //请求网络数据前先加载  上次的电影数据
 //        List<SimpleSubjectBean> mSimData
-        mSimAdapter = new SimpleSubjectAdapter(getActivity(), mSimData, isComing);
-        if (getRecord() != null) {//上次有存数据,不空
+            mSimAdapter = new SimpleSubjectAdapter(getActivity(), mSimData, isComing);
+            if (getRecord() != null) {//上次有存数据,不空
 // public static final Type simpleSubTypeList = new TypeToken<List<SimpleSubjectBean>>() {}.getType();
-            mSimData = new Gson().fromJson(getRecord(), simpleSubTypeList);///?????
+                mSimData = new Gson().fromJson(getRecord(), simpleSubTypeList);//取出保存的字符串,解析Json
 //            RECORD_COUNT=20
-            mSimAdapter.updateList(mSimData, RECORD_COUNT);
-        }
-        mSimAdapter.setOnItemClickListener(this);//点击了电影转入详情界面
-        mRecView.setAdapter(mSimAdapter);
+                mSimAdapter.updateList(mSimData, RECORD_COUNT);
+            }
+            mSimAdapter.setOnItemClickListener(this);//点击了电影转入详情界面
+            mRecView.setAdapter(mSimAdapter);
     }
 
     /**
@@ -282,73 +285,75 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
      * 为RecyclerView设置下拉刷新及floatingActionButton的消失出现
      */
     private void setOnScrollListener() {
-//        if (mRecView == null) {
-//            return;
-//        }
-//        if (mScrollListener == null) {
-//            mScrollListener = new RecyclerView.OnScrollListener() {
-//                int lastVisibleItem;
-//                boolean isShow = false;
-//
-//                @Override
-//                public void onScrollStateChanged(RecyclerView recyclerView,
-//                                                 int newState) {
-//                    super.onScrollStateChanged(recyclerView, newState);
-//                    if (newState == SCROLL_STATE_IDLE
-//                            && lastVisibleItem + 2 > mSimAdapter.getItemCount()
-//                            && mSimAdapter.getItemCount() - 1 < mSimAdapter.getTotalDataCount()) {
-//                        loadMore();
-//                    }
-//                }
-//                @Override
-//                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                    super.onScrolled(recyclerView, dx, dy);
-//                    LinearLayoutManager lm = (LinearLayoutManager) mRecView.getLayoutManager();
-//                    lastVisibleItem = lm.findLastVisibleItemPosition();
-//                    if (lm.findFirstVisibleItemPosition() == 0) {
-//                        if (isShow) {
+        if (mRecView == null) {//如果RecyclerView不存在则返回
+            return;
+        }
+        if (mScrollListener == null) {//如果ScrollListener还没有,则创建
+            mScrollListener = new RecyclerView.OnScrollListener() {
+                int lastVisibleItem;//最底下可以看到的元素
+                boolean isShow = false;
+
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView,int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+//                    SCROLL_STATE_IDLE 停止滑动状态
+                    //lastVisibleItem + 2 > mSimAdapter.getItemCount() 提前2个进行加载,避免用户等待
+                    if (newState == SCROLL_STATE_IDLE
+                            && lastVisibleItem + 2 > mSimAdapter.getItemCount()
+                            && mSimAdapter.getItemCount() - 1 < mSimAdapter.getTotalDataCount()) {
+                        loadMore();
+                    }
+                }
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+//                    为floatingActionBar的出现消失设置动画效果
+                    LinearLayoutManager lm = (LinearLayoutManager) mRecView.getLayoutManager();
+                    lastVisibleItem = lm.findLastVisibleItemPosition();
+                    if (lm.findFirstVisibleItemPosition() == 0) {
+                        if (isShow) {//正在显示
 //                            animatorForGone();
-//                            isShow = false;
-//                        }
-//                    } else if (dy < -50 && !isShow) {
+                            isShow = false;
+                        }
+                    } else if (dy < -50 && !isShow) {//向下滑动,并且没有被显示出来
 //                        animatorForVisible();
-//                        isShow = true;
-//                    } else if (dy > 20 && isShow) {
+                        isShow = true;
+                    } else if (dy > 20 && isShow) {//向上滑,正在显示
 //                        animatorForGone();
-//                        isShow = false;
-//                    }
-//                }
-//            };
-//            mRecView.addOnScrollListener(mScrollListener);
-//        }
+                        isShow = false;
+                    }
+                }
+            };
+            mRecView.addOnScrollListener(mScrollListener);
+        }
     }
 
     /**
      * adapter加载更多
      */
     private void loadMore() {
-//        //防止出现多次加载的情况
-//        if (mSimAdapter.getStart() == mStart) return;
-//        mStart = mSimAdapter.getStart();
-//        String url = mRequestUrl + ("?start=" + mStart);
-//        JsonObjectRequest request = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                try {
-//                    List<SimpleSubjectBean> moreData = new GsonBuilder().create().fromJson(
-//                            response.getString(JSON_SUBJECTS), simpleSubTypeList);
-//                    mSimAdapter.loadMoreData(moreData);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                mSimAdapter.loadFail();
-//            }
-//        });
-//        MyApplication.addRequest(request,VOLLEY_TAG + mTitlePos);
+        //防止出现多次加载的情况
+        if (mSimAdapter.getStart() == mStart) return;
+        mStart = mSimAdapter.getStart();
+        String url = mRequestUrl + ("?start=" + mStart);//GET 的索引方式 ?start=XXX
+        JsonObjectRequest request = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    List<SimpleSubjectBean> moreData = new GsonBuilder().create().fromJson(
+                            response.getString(JSON_SUBJECTS), simpleSubTypeList);
+                    mSimAdapter.loadMoreData(moreData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mSimAdapter.loadFail();
+            }
+        });
+        MyApplication.addRequest(request,VOLLEY_TAG + mTitlePos);
     }
     /**
      * 为RecyclerView设置-2dp的padding用于抵消item的margin
@@ -382,10 +387,37 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
     @Override
     public void onItemClick(String id, String imageUrl) {
         if (id.equals(SimpleSubjectAdapter.FOOT_VIEW_ID)) {
-//            loadMore();
+            loadMore();
         } else {
 //            SubjectActivity.toActivity(getActivity(), id, imageUrl);
         }
     }
+
+    /**
+     * 为floatingActionBar的出现消失设置动画效果
+     */
+//    private void animatorForGone() {
+//        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_gone);
+//        anim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animator) {
+//                mBtn.setVisibility(View.GONE);
+//            }
+//        });
+//        anim.setTarget(mBtn);
+//        anim.start();
+//    }
+//
+//    private void animatorForVisible() {
+//        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_visible);
+//        anim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationStart(Animator animator) {
+//                mBtn.setVisibility(View.VISIBLE);
+//            }
+//        });
+//        anim.setTarget(mBtn);
+//        anim.start();
+//    }
 
 }
