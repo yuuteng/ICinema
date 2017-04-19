@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class BoxSubjectBean {
     private int box;
+//    new: true  修改Json :前面的名字为new
     @SerializedName("new")
     private boolean newX;
     private int rank;
@@ -43,5 +44,9 @@ public class BoxSubjectBean {
 
     public void setSubject(SimpleSubjectBean subject) {
         this.subject = subject;
+    }
+
+    public boolean getNewX() {
+        return newX;
     }
 }

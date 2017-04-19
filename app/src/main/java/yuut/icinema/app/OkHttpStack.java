@@ -25,7 +25,6 @@ public class OkHttpStack extends HurlStack{
         }
         this.okHttpClient = okHttpClient;
     }
-
     @Override
     protected HttpURLConnection createConnection(URL url) throws IOException {
         OkUrlFactory mFactory = new OkUrlFactory(okHttpClient);

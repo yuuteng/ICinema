@@ -1,7 +1,5 @@
 package yuut.icinema.ui.fragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,10 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +20,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +31,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import yuut.icinema.R;
 import yuut.icinema.adapter.BaseAdapter;
+import yuut.icinema.adapter.BoxAdapter;
 import yuut.icinema.adapter.SimpleSubjectAdapter;
 import yuut.icinema.app.MyApplication;
+import yuut.icinema.bean.BoxSubjectBean;
 import yuut.icinema.bean.SimpleSubjectBean;
 import yuut.icinema.support.Util.DensityUtil;
 
@@ -85,9 +81,9 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
 
     private String mDataString;
     private SimpleSubjectAdapter mSimAdapter;
-//    private BoxAdapter mBoxAdapter;
+    private BoxAdapter mBoxAdapter;
     private List<SimpleSubjectBean> mSimData = new ArrayList<>(); //电影数据列表
-//    private List<BoxSubjectBean> mBoxData = new ArrayList<>();
+    private List<BoxSubjectBean> mBoxData = new ArrayList<>();
     private RecyclerView.OnScrollListener mScrollListener;
 
     private int mTitlePos;
