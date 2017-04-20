@@ -21,9 +21,9 @@
             android:title="系统">
             <menu>
                 <item
-                    android:id="@+id/nav_setting"
+                    android:id="@+id/nav_about"
                     android:icon="@drawable/ic_setting"
-                    android:title="设置"/>
+                    android:title="关于"/>
             </menu>
         </item>
     </group>

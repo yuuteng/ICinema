@@ -1,5 +1,6 @@
 package yuut.icinema.ui.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -136,6 +137,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Toast.makeText(this, "onNavigationItemSelected", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.nav_about) {
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
+        }
         return false;
+    }
+
+    //页面跳转
+    private void prepareIntent(Class cla) {
+        this.startActivity(new Intent(MainActivity.this, cla));
     }
 }
