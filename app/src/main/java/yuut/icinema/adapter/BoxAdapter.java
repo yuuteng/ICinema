@@ -1,6 +1,5 @@
 package yuut.icinema.adapter;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.Bind;

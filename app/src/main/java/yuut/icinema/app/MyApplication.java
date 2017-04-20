@@ -25,7 +25,7 @@ import yuut.icinema.db.DataSource;
 //管理全局的状态信息
 public class MyApplication extends Application {
     private static DisplayImageOptions mLoaderOptions;
-    private static RequestQueue mQueue;
+    private static RequestQueue mQueue; //volley消息队列
     private static DataSource mSource;
 
     @Override
@@ -72,7 +72,7 @@ public class MyApplication extends Application {
     public static DisplayImageOptions getLoaderOptions() {
         return mLoaderOptions;
     }
-
+    //volley使用
     public static void addRequest(Request request, Object tag) {
         request.setTag(tag);
         request.setRetryPolicy(new DefaultRetryPolicy(10000,
@@ -80,7 +80,6 @@ public class MyApplication extends Application {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mQueue.add(request);
     }
-
     public static void removeRequest(Object tag) {
         mQueue.cancelAll(tag);
     }

@@ -11,7 +11,7 @@ import java.net.URL;
 /**
  * Created by yuut on 2017/4/13.
  */
-
+//Volley 需要使用的底层请求
 public class OkHttpStack extends HurlStack{
     private final OkHttpClient okHttpClient;
 
