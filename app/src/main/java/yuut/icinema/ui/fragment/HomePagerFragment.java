@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -43,6 +44,7 @@ import static yuut.icinema.support.Constant.API;
 import static yuut.icinema.support.Constant.COMING;
 import static yuut.icinema.support.Constant.IN_THEATERS;
 import static yuut.icinema.support.Constant.US_BOX;
+import static yuut.icinema.support.Constant.simpleBoxTypeList;
 import static yuut.icinema.support.Constant.simpleSubTypeList;
 
 /**
@@ -160,7 +162,7 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
                 initSimpleRecyclerView(true);
                 break;
             case POS_US_BOX:
-                //initBoxRecyclerView();
+                initBoxRecyclerView();
                 break;
             default:
         }
@@ -209,17 +211,18 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
      * 初始化“北美票房”对应的fragment
      */
     private void initBoxRecyclerView() {
-//        int padding = DensityUtil.dp2px(getContext(), 2f);
-//        setPaddingForRecyclerView(padding);
-//        GridLayoutManager boxManager = new GridLayoutManager(getActivity(), 3);
-//        mRecView.setLayoutManager(boxManager);
-//        //请求网络数据前先加载上次的电影数据
-//        if (getRecord() != null) {
-//            mBoxData = new Gson().fromJson(getRecord(), simpleBoxTypeList);
-//        }
-//        mBoxAdapter = new BoxAdapter(getActivity(), mBoxData);
-//        mBoxAdapter.setOnItemClickListener(this);
-//        mRecView.setAdapter(mBoxAdapter);
+        int padding = DensityUtil.dp2px(getContext(), 2f);
+        setPaddingForRecyclerView(padding);
+        //让RecyclerView 显示3列
+        GridLayoutManager boxManager = new GridLayoutManager(getActivity(), 3);
+        mRecView.setLayoutManager(boxManager);
+        //请求网络数据前先加载上次的电影数据
+        if (getRecord() != null) {
+            mBoxData = new Gson().fromJson(getRecord(), simpleBoxTypeList);
+        }
+        mBoxAdapter = new BoxAdapter(getActivity(), mBoxData);
+        mBoxAdapter.setOnItemClickListener(this);
+        mRecView.setAdapter(mBoxAdapter);
     }
 
     //更新电影数据
@@ -236,7 +239,7 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
                 break;
             case POS_US_BOX:
                 mRequestUrl = API + US_BOX;
-//                volley_Get_USBox();
+                volley_Get_USBox();
                 break;
         }
     }
@@ -259,6 +262,38 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
                             mSimAdapter.updateList(mSimData, mTotalItem);
                             //实现recyclerView的下拉刷新
                             setOnScrollListener();
+                            saveRecord();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } finally {
+                            mRefresh.setRefreshing(false);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_SHORT).show();
+                        mRefresh.setRefreshing(false);
+                    }
+                });
+        MyApplication.addRequest(request,VOLLEY_TAG + mTitlePos);
+    }
+
+    /**
+     * 通过Volley框架的全局消息队列获取到url对应的数据
+     */
+    private void volley_Get_USBox() {
+        mRefresh.setRefreshing(true);
+        JsonObjectRequest request = new JsonObjectRequest(mRequestUrl,
+                new Response.Listener<JSONObject>() {
+                    private Gson gson = new GsonBuilder().create();
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            mDataString = response.getString(JSON_SUBJECTS);//subjects
+                            mBoxData = gson.fromJson(mDataString, simpleBoxTypeList);
+                            mBoxAdapter.updateList(mBoxData);
                             saveRecord();
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -1,6 +1,7 @@
 package yuut.icinema.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,12 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -53,7 +60,7 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
     private boolean isComingFilm;
 
 //    imageLoader的异步加载监听接口实例
-//    private ImageLoadingListener imageLoadingListener =new AnimateFirstDisplayListener();
+    private ImageLoadingListener imageLoadingListener =new AnimateFirstDisplayListener();
 
     //构造函数
     public SimpleSubjectAdapter(Context context, List<SimpleSubjectBean> data,boolean isComingFilm) {
@@ -223,9 +230,9 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             text_director.append(CelebrityUtil.list2String(sub.getDirectors(), '/'));
             text_cast.setText(StringUtil.getSpannableString("主演:", Color.GRAY));
             text_cast.append(CelebrityUtil.list2String(sub.getCasts(), '/'));
-            //显示图片
-//            imageLoader.displayImage(sub.getImages().getLarge(),
-//                    image_film, options, imageLoadingListener);
+            //显示图片(调用)
+            imageLoader.displayImage(sub.getImages().getLarge(),
+                    image_film, options, imageLoadingListener);
         }
         @Override
         public void onClick(View view) {
@@ -294,19 +301,19 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
         }
     }
 //----------------------两个ViewHolder   以上为RecyclerView基本操作-----------------------------------
-
-//    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
-//        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
-//        @Override
-//        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-//            if (loadedImage != null) {
-//                ImageView imageView = (ImageView) view;
-//                boolean firstDisplay = !displayedImages.contains(imageUri);//是否第一次被加载
-//                if (firstDisplay) {//如果是第一次被加载,加载图片并加入list中
-//                    FadeInBitmapDisplayer.animate(imageView, 500);
-//                    displayedImages.add(imageUri);
-//                }
-//            }
-//        }
-//    }
+//加载图片 实现
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);//是否第一次被加载
+                if (firstDisplay) {//如果是第一次被加载,加载图片并加入list中
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
+            }
+        }
+    }
 }

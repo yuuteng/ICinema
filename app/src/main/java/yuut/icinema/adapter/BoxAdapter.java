@@ -1,6 +1,9 @@
 package yuut.icinema.adapter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -33,14 +42,14 @@ public class BoxAdapter extends BaseAdapter<BoxAdapter.ViewHolder> {
 
     private LayoutInflater mInflater;
     private List<BoxSubjectBean> mData;
-
-//    private ImageLoadingListener imageLoadingListener = new AnimateFirstDisplayListener();
+    //加载图片Listener
+    private ImageLoadingListener imageLoadingListener = new AnimateFirstDisplayListener();
 
     public static final String[] RANK = {"th", "1st", "2nd", "3rd"};
 
-    public BoxAdapter(LayoutInflater mInflater, List<BoxSubjectBean> mData) {
-        this.mInflater = mInflater;
-        this.mData = mData;
+    public BoxAdapter(Context context, List<BoxSubjectBean> data) {
+        this.mData = data;
+        this.mInflater = LayoutInflater.from(context);
     }
 
     public void updateList(List<BoxSubjectBean> data) {
@@ -122,9 +131,9 @@ public class BoxAdapter extends BaseAdapter<BoxAdapter.ViewHolder> {
                 text_rating.setText(String.format("%s", rating));
             }
             text_title.setText(simSubject.getTitle());
-
-//            imageLoader.displayImage(simSubject.getImages().getLarge(),
-//                    image_film, options, imageLoadingListener);
+//            加载图片(调用)
+            imageLoader.displayImage(simSubject.getImages().getLarge(),
+                    image_film, options, imageLoadingListener);
         }
 
         private int getRankTextColor(int rank) {
@@ -139,24 +148,22 @@ public class BoxAdapter extends BaseAdapter<BoxAdapter.ViewHolder> {
                     return Color.GRAY;
             }
         }
-
-
     }
-//    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
-//        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
-//        @Override
-//        public void onLoadingComplete(
-//                String imageUri, View view, Bitmap loadedImage) {
-//            if (loadedImage != null) {
-//                ImageView imageView = (ImageView) view;
-//                boolean firstDisplay = !displayedImages.contains(imageUri);
-//                if (firstDisplay) {
-//                    FadeInBitmapDisplayer.animate(imageView, 500);
-//                    displayedImages.add(imageUri);
-//                }
-//            }
-//        }
-//    }
+    //加载图片(实现)
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
+            }
+        }
+    }
 }
 
 

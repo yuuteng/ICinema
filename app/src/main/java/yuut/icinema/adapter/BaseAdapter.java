@@ -22,8 +22,9 @@ public class BaseAdapter <T extends RecyclerView.ViewHolder> extends RecyclerVie
     private int mLastPosition = -1;
     protected OnItemClickListener mCallback;
 
-//    protected ImageLoader imageLoader = ImageLoader.getInstance();
-//    protected DisplayImageOptions options = MyApplication.getLoaderOptions();
+    //加载图片
+    protected ImageLoader imageLoader = ImageLoader.getInstance();
+    protected DisplayImageOptions options = MyApplication.getLoaderOptions();
 
     @Override
     public T onCreateViewHolder(ViewGroup parent, int viewType) {
