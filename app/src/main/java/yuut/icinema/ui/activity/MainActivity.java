@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,13 +18,18 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
+
 import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import yuut.icinema.R;
+import yuut.icinema.ui.fragment.BaseFragment;
+import yuut.icinema.ui.fragment.CollectFragment;
 import yuut.icinema.ui.fragment.HomeFragment;
+import yuut.icinema.ui.fragment.TopFragment;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener,
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity
             mCurFragment = homeFragment;
         }
         //-------------------未完待续
-
+        //头像设置
     }
     private void initEvent() {
         mNavView.setNavigationItemSelectedListener(this);
@@ -136,12 +142,52 @@ public class MainActivity extends AppCompatActivity
     //选中NavigationItem 响应事件
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(this, "onNavigationItemSelected", Toast.LENGTH_SHORT).show();
         if (item.getItemId() == R.id.nav_about) {
             Intent intent = new Intent(MainActivity.this, AboutActivity.class);
             startActivity(intent);
         }
-        return false;
+        item.setChecked(true);
+        mDrawer.closeDrawers();
+        //根据选择的标题,显示相应Fragment
+        switchFragment(item.getTitle().toString());
+        return true;
+    }
+    //换掉ViewPager里面的Fragment
+    private void switchFragment(String title) {
+        mTitle = title;
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        Fragment fragment = mFragmentManager.findFragmentByTag(title);
+        if (fragment == null) {
+            transaction.hide(mCurFragment);
+            fragment = createFragmentByTitle(title);
+            transaction.add(R.id.rl_main_container, fragment, title);
+            mCurFragment = fragment;
+        } else if (fragment != mCurFragment) {
+            transaction.hide(mCurFragment).show(fragment);
+            mCurFragment = fragment;
+        }
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).
+                commit();
+        supportInvalidateOptionsMenu();
+        if (mTitle != null) {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) actionBar.setTitle(mTitle);
+        }
+    }
+    /**
+     * 根据MenuItem的title返回对应的fragment
+     */
+    private Fragment createFragmentByTitle(String title) {
+        switch (title) {
+            case "首页":
+                return new HomeFragment();
+            case "收藏":
+                return new CollectFragment();
+            case "Top250":
+                return new TopFragment();
+            default:
+                return new BaseFragment();
+        }
     }
 
     //页面跳转

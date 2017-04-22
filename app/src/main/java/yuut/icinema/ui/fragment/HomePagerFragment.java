@@ -1,5 +1,8 @@
 package yuut.icinema.ui.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -38,6 +41,7 @@ import yuut.icinema.app.MyApplication;
 import yuut.icinema.bean.BoxSubjectBean;
 import yuut.icinema.bean.SimpleSubjectBean;
 import yuut.icinema.support.Util.DensityUtil;
+import yuut.icinema.ui.activity.SubjectActivity;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static yuut.icinema.support.Constant.API;
@@ -343,14 +347,14 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
                     lastVisibleItem = lm.findLastVisibleItemPosition();
                     if (lm.findFirstVisibleItemPosition() == 0) {
                         if (isShow) {//正在显示
-//                            animatorForGone();
+                            animatorForGone();
                             isShow = false;
                         }
                     } else if (dy < -50 && !isShow) {//向下滑动,并且没有被显示出来
-//                        animatorForVisible();
+                        animatorForVisible();
                         isShow = true;
                     } else if (dy > 20 && isShow) {//向上滑,正在显示
-//                        animatorForGone();
+                        animatorForGone();
                         isShow = false;
                     }
                 }
@@ -420,35 +424,36 @@ public class HomePagerFragment extends Fragment implements BaseAdapter.OnItemCli
         if (id.equals(SimpleSubjectAdapter.FOOT_VIEW_ID)) {
             loadMore();
         } else {
-//            SubjectActivity.toActivity(getActivity(), id, imageUrl);
+            //跳转到电影详情界面
+            SubjectActivity.toActivity(getActivity(), id, imageUrl);
         }
     }
 
     /**
      * 为floatingActionBar的出现消失设置动画效果
      */
-//    private void animatorForGone() {
-//        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_gone);
-//        anim.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-//                mBtn.setVisibility(View.GONE);
-//            }
-//        });
-//        anim.setTarget(mBtn);
-//        anim.start();
-//    }
-//
-//    private void animatorForVisible() {
-//        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_visible);
-//        anim.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationStart(Animator animator) {
-//                mBtn.setVisibility(View.VISIBLE);
-//            }
-//        });
-//        anim.setTarget(mBtn);
-//        anim.start();
-//    }
+    private void animatorForGone() {
+        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_gone);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                mFABtn.setVisibility(View.GONE);
+            }
+        });
+        anim.setTarget(mFABtn);
+        anim.start();
+    }
+
+    private void animatorForVisible() {
+        Animator anim = AnimatorInflater.loadAnimator(getActivity(), R.animator.scale_visible);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                mFABtn.setVisibility(View.VISIBLE);
+            }
+        });
+        anim.setTarget(mFABtn);
+        anim.start();
+    }
 
 }

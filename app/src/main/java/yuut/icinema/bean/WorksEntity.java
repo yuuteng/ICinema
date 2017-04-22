@@ -6,7 +6,7 @@ import java.util.List;
  * Created by yuut on 2017/4/13.
  */
 //影人作品
-class WorksEntity {
+public class WorksEntity {
     private SubjectEntity subject;
     private List<String> roles;
 

@@ -19,7 +19,8 @@
             android:minHeight="?attr/actionBarSize"
             app:popupTheme="@style/Theme.AppCompat.Light"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:titleTextColor="@color/white">
+            app:titleTextColor="@color/white"
+            >
         </android.support.v7.widget.Toolbar>
 
         <RelativeLayout

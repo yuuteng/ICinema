@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--右上角 搜索 和 收藏 按钮-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_sub_search"
+        android:icon="@drawable/ic_search"
+        android:title="搜索"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_sub_collect"
+        android:icon="@drawable/ic_uncollect"
+        android:title="收藏"
+        app:showAsAction="ifRoom"/>
+</menu>

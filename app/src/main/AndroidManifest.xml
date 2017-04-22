@@ -21,6 +21,11 @@
         </activity>
         <activity android:name=".ui.activity.AboutActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.SubjectActivity"
+            android:theme="@style/AppTheme.StatusBar"/>
+        <activity
+            android:name=".ui.activity.CelebrityActivity" />
+        <activity android:name=".ui.activity.SearchActivity"/>
     </application>
 
 </manifest>
