@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="select_header_item">
+        <item>从相册中查找</item>
+        <item>拍照</item>
+    </string-array>
+</resources>

@@ -50,6 +50,7 @@ import com.google.gson.GsonBuilder;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.orhanobut.logger.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -526,10 +527,18 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
                 volley_Get_Recommend();
                 break;
             //FloatingActionButton
-//            case R.id.btn_subj_skip://跳往豆瓣电影的移动版网页
-//                if (mSubject == null) break;
+            case R.id.btn_subj_skip://跳往豆瓣电影的移动版网页
+                if (mSubject == null) break;
+//                https://movie.douban.com/subject/26776117/mobile
+//                https://movie.douban.com/subject/26776117/cinema/dalian/
 //                WebActivity.toWebActivity(this, mSubject.getMobile_url(), mSubject.getTitle());
-//                break;
+                StringBuilder sb = new StringBuilder();
+                sb.append("https://movie.douban.com/subject/");
+                sb.append(mSubject.getId());
+                sb.append("/cinema/dalian/");
+
+                WebActivity.toWebActivity(this, sb.toString() , mSubject.getTitle());
+                break;
         }
     }
 

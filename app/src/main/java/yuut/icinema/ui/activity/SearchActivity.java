@@ -57,6 +57,7 @@ public class SearchActivity extends AppCompatActivity implements BaseAdapter.OnI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //activity_search toolbar + RecyclerView
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
         initView();
@@ -93,8 +94,7 @@ public class SearchActivity extends AppCompatActivity implements BaseAdapter.OnI
                                 mDialog = null;
                             }
                             if (mData.size() < 1) {
-                                Toast.makeText(SearchActivity.this, no_result,
-                                        Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SearchActivity.this, no_result,Toast.LENGTH_SHORT).show();
                             } else {
                                 mAdapter = new SearchAdapter(SearchActivity.this, mData);
                                 mAdapter.setOnItemClickListener(SearchActivity.this);
@@ -112,8 +112,7 @@ public class SearchActivity extends AppCompatActivity implements BaseAdapter.OnI
                             mDialog.dismiss();
                             mDialog = null;
                         }
-                        Toast.makeText(SearchActivity.this, error_result,
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SearchActivity.this, error_result,Toast.LENGTH_SHORT).show();
                     }
                 });
         MyApplication.addRequest(request, VOLLEY_TAG);
