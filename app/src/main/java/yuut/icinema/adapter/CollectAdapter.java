@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +27,7 @@ import yuut.icinema.support.Util.StringUtil;
 
 public class CollectAdapter extends BaseAdapter<CollectAdapter.ViewHolder> {
 
-    private static final String URI_FOR_FILE = "file:/";
+    private static final String URI_FOR_FILE = "file://";
 
     private Context mContext;
     private LayoutInflater mInflater;
@@ -137,10 +140,14 @@ public class CollectAdapter extends BaseAdapter<CollectAdapter.ViewHolder> {
                     CelebrityUtil.list2String(subj.getDirectors(), ',')));
             text_cast.append("主演: ");
             text_cast.append(CelebrityUtil.list2String(subj.getCasts(), ','));
+
             if (subj.getLocalImageFile() != null) {
-                imageLoader.displayImage(
-                        String.format("%s%s", URI_FOR_FILE, subj.getLocalImageFile()),
-                        image_film, options);
+                Logger.d(String.format("%s%s", URI_FOR_FILE, subj.getLocalImageFile()));
+                Picasso.with(mContext)
+                        .load(String.format("%s%s", URI_FOR_FILE, subj.getLocalImageFile()))
+                        .placeholder(R.drawable.no_image)
+                        .error(R.drawable.no_image)
+                        .into(image_film);
             }
         }
 

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -58,9 +59,6 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
 
     //判断是否属于 即将上映
     private boolean isComingFilm;
-
-//    imageLoader的异步加载监听接口实例
-    private ImageLoadingListener imageLoadingListener =new AnimateFirstDisplayListener();
 
     //构造函数
     public SimpleSubjectAdapter(Context context, List<SimpleSubjectBean> data,boolean isComingFilm) {
@@ -230,9 +228,12 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             text_director.append(CelebrityUtil.list2String(sub.getDirectors(), '/'));
             text_cast.setText(StringUtil.getSpannableString("主演:", Color.GRAY));
             text_cast.append(CelebrityUtil.list2String(sub.getCasts(), '/'));
-            //显示图片(调用)
-            imageLoader.displayImage(sub.getImages().getLarge(),
-                    image_film, options, imageLoadingListener);
+            //显示图片(Picasso)
+            Picasso.with(mContext)
+                    .load(sub.getImages().getLarge())
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
+                    .into(image_film);
         }
         @Override
         public void onClick(View view) {
@@ -300,20 +301,5 @@ public class SimpleSubjectAdapter extends BaseAdapter<RecyclerView.ViewHolder> {
             }
         }
     }
-//----------------------两个ViewHolder   以上为RecyclerView基本操作-----------------------------------
-//加载图片 实现
-    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
-        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
-        @Override
-        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-            if (loadedImage != null) {
-                ImageView imageView = (ImageView) view;
-                boolean firstDisplay = !displayedImages.contains(imageUri);//是否第一次被加载
-                if (firstDisplay) {//如果是第一次被加载,加载图片并加入list中
-                    FadeInBitmapDisplayer.animate(imageView, 500);
-                    displayedImages.add(imageUri);
-                }
-            }
-        }
-    }
+//----------------------两个ViewHolder   RecyclerView基本操作↑-----------------------------------
 }

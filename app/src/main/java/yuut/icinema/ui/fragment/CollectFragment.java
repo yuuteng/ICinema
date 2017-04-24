@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,10 +46,9 @@ public class CollectFragment extends Fragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_base, container, false);
+        mView = inflater.inflate(R.layout.fragment_base, container, false);
         ButterKnife.bind(this, mView);
-        mRecView.setLayoutManager(
-                new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mRecView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         mRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         mRefreshLayout.setProgressViewOffset(false, 0, DensityUtil.dp2px(getContext(), 32f));
         initData();

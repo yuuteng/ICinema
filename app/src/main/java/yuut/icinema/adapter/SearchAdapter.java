@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import butterknife.Bind;
@@ -95,7 +97,11 @@ public class SearchAdapter extends BaseAdapter<SearchAdapter.ViewHolder>{
             text_director.append(CelebrityUtil.list2String(subj.getDirectors(), '/'));
             text_cast.setText("主演: ");
             text_cast.append(CelebrityUtil.list2String(subj.getCasts(), '/'));
-            imageLoader.displayImage(subj.getImages().getLarge(), image_film, options);
+            Picasso.with(mContext)
+                    .load(subj.getImages().getLarge())
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
+                    .into(image_film);
         }
         @Override
         public void onClick(View view) {
