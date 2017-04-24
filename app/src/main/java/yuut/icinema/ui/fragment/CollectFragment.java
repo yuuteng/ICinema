@@ -84,7 +84,7 @@ public class CollectFragment extends Fragment
     public void itemClick(String id, String imageUrl) {
         SubjectActivity.toActivity(getActivity(), id, imageUrl);
     }
-
+    //snackbar
     @Override
     public void itemRemove(final int pos, final String id) {
         Snackbar.make(mView, "是否要取消收藏...", Snackbar.LENGTH_LONG).
