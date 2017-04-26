@@ -19,8 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.GsonBuilder;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +69,6 @@ public class CelebrityActivity extends BaseActivity implements SimpleFilmAdapter
 
     private CelebrityBean mCelebrity;
     private List<SimpleCardBean> mWorksData = new ArrayList<>();
-
-    private ImageLoader imageLoader = ImageLoader.getInstance();
-    private DisplayImageOptions options = MyApplication.getLoaderOptions();
 
     public static void toActivity(Context context, String id) {
         Intent intent = new Intent(context, CelebrityActivity.class);
@@ -153,7 +149,7 @@ public class CelebrityActivity extends BaseActivity implements SimpleFilmAdapter
     private void setViewAfterGetData() {
         if (mCelebrity == null) return;
         initToolBar(toolbar, mCelebrity.getName(),R.mipmap.icon_arrow_back);
-        imageLoader.displayImage(mCelebrity.getAvatars().getMedium(), mImage, options);
+        Picasso.with(this).load(mCelebrity.getAvatars().getMedium()).into(mImage);
         mName.setText(mCelebrity.getName());
         mNameEn.setText(mCelebrity.getName_en());
         String gender = "性别: ";

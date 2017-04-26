@@ -27,8 +27,6 @@ import yuut.icinema.support.Util.StringUtil;
 
 public class CollectAdapter extends BaseAdapter<CollectAdapter.ViewHolder> {
 
-    private static final String URI_FOR_FILE = "file://";
-
     private Context mContext;
     private LayoutInflater mInflater;
     private List<SubjectBean> mData;
@@ -141,14 +139,11 @@ public class CollectAdapter extends BaseAdapter<CollectAdapter.ViewHolder> {
             text_cast.append("主演: ");
             text_cast.append(CelebrityUtil.list2String(subj.getCasts(), ','));
 
-            if (subj.getLocalImageFile() != null) {
-                Logger.d(String.format("%s%s", URI_FOR_FILE, subj.getLocalImageFile()));
-                Picasso.with(mContext)
-                        .load(String.format("%s%s", URI_FOR_FILE, subj.getLocalImageFile()))
-                        .placeholder(R.drawable.no_image)
-                        .error(R.drawable.no_image)
-                        .into(image_film);
-            }
+            Picasso.with(mContext)
+                    .load(subj.getImages().getLarge())
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
+                    .into(image_film);
         }
 
         @Override
@@ -156,8 +151,7 @@ public class CollectAdapter extends BaseAdapter<CollectAdapter.ViewHolder> {
             if (view == btn_delete) {
                 remove(getLayoutPosition());
             } else {
-                callback.itemClick(mData.get(getLayoutPosition()).getId(),
-                        mData.get(getLayoutPosition()).getImages().getLarge());
+                callback.itemClick(mData.get(getLayoutPosition()).getId(),mData.get(getLayoutPosition()).getImages().getLarge());
             }
         }
     }

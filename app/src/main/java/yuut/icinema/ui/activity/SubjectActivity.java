@@ -5,11 +5,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
-import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -29,7 +28,6 @@ import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionSet;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,14 +47,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.orhanobut.logger.Logger;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +89,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
     private static final String URI_FOR_FILE = "file:/";
     private static final String URI_FOR_IMAGE = ".png";
 
-    private int[] cast_id = {R.id.view_cast_layout_1,R.id.view_cast_layout_2,
+    private int[] cast_id = {R.id.view_cast_layout_1, R.id.view_cast_layout_2,
             R.id.view_cast_layout_3, R.id.view_cast_layout_4,
             R.id.view_cast_layout_5, R.id.view_cast_layout_6};
 
@@ -109,7 +108,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
     @Bind(R.id.iv_header_subj)
     ImageView mToolbarImage;
     @Bind(R.id.introduce_container_subj) //中部电影介绍
-    LinearLayout mIntroduceContainer;
+            LinearLayout mIntroduceContainer;
     @Bind(R.id.toolbar_subj)
     Toolbar mToolbar;
     @Bind(R.id.iv_subj_images)
@@ -161,9 +160,6 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
     private int mImageWidth;
     private FrameLayout.LayoutParams mIntroduceContainerParams;
 
-    private ImageLoader imageLoader = ImageLoader.getInstance();
-    private DisplayImageOptions options = MyApplication.getLoaderOptions();
-
     //----------------------------------------------------------------------------------------
     //转到该Activity时需要传入的值
     //subject_id    image_url
@@ -174,24 +170,23 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         //if当前版本>21 增加转换动画
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
 //            共享元素跳转
-            activity.startActivity(intent,makeSceneTransitionAnimation(activity).toBundle());
+            activity.startActivity(intent, makeSceneTransitionAnimation(activity).toBundle());
         } else {
             activity.startActivity(intent);
         }
     }
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//    public static void toActivityWithShareElement(Activity context, ImageView image, String id) {
-//        Intent intent = new Intent(context, SubjectActivity.class);
-//        intent.putExtra(KEY_SUBJECT_ID, id);
-//        image.setTransitionName(SHARE_IMAGE);
-//        context.startActivity(intent, makeSceneTransitionAnimation(
-//                context, image, image.getTransitionName()).toBundle());
-//    }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void toActivityWithShareElement(Activity context, ImageView image, String id) {
+        Intent intent = new Intent(context, SubjectActivity.class);
+        intent.putExtra(KEY_SUBJECT_ID, id);
+        image.setTransitionName(SHARE_IMAGE);
+        context.startActivity(intent, makeSceneTransitionAnimation(
+                context, image, image.getTransitionName()).toBundle());
+    }
 
     /**
      * activity转场动画
-     *
      */
 //    @TargetApi使高版本API的代码在低版本SDK不报错
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -202,7 +197,8 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         transition.setDuration(400);
         return transition;
     }
-//--------------生命周期↓----------------------------------------------
+
+    //--------------生命周期↓----------------------------------------------
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,6 +211,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         }
         //获取intent中携带的  subject_id  键值
         mId = getIntent().getStringExtra(KEY_SUBJECT_ID);
+
         initView();
         initEvent();
         //从数据库中取出数据(收藏过的电影)
@@ -227,6 +224,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
             volleyGetSubject();
         }
     }
+
     //右上角 搜索 和 收藏 两个选项
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -239,6 +237,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         }
         return true;
     }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -274,26 +273,34 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         mRecommendFilmAdapter.update(mRecommendData);
 
         mFile = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), mId + URI_FOR_IMAGE);
-        String imageUri = (mFile.exists() ?
-                String.format("%s%s", URI_FOR_FILE, mFile.getPath()) :
-                getIntent().getStringExtra(KEY_IMAGE_URL));
-        imageLoader.displayImage(imageUri, mImage, options);
-        imageLoader.displayImage(imageUri, mToolbarImage, options,
-                new SimpleImageLoadingListener() {
+
+        String imageUri = getIntent().getStringExtra(KEY_IMAGE_URL);
+        Picasso.with(this).load(imageUri).into(mImage);
+        //根据电影海报颜色,调整 详情页面顶部的颜色
+        Picasso.with(this).load(imageUri).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                     @Override
-                    public void onLoadingComplete(String imageUri, View view,final Bitmap loadedImage) {
-                        super.onLoadingComplete(imageUri, view, loadedImage);
-                        //根据电影海报颜色,调整 详情页面顶部的颜色
-                        Palette.from(loadedImage).generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                int defaultBgColor = Color.parseColor("#3F51B5");//colorPrimary
-                                int bgColor = palette.getDarkVibrantColor(defaultBgColor);//暗鲜艳色
-                                mToolbarContainer.setBackgroundColor(bgColor);
-                            }
-                        });
+                    public void onGenerated(Palette palette) {
+                        int defaultBgColor = Color.parseColor("#3F51B5");//colorPrimary
+                        int bgColor = palette.getDarkVibrantColor(defaultBgColor);//暗鲜艳色
+                        mToolbarContainer.setBackgroundColor(bgColor);
                     }
                 });
+                mToolbarImage.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
 
@@ -331,7 +338,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
                         mRefresh.setRefreshing(false);
                     }
                 });
-        MyApplication.addRequest(stringRequest,mId);
+        MyApplication.addRequest(stringRequest, mId);
     }
 
     /**
@@ -426,6 +433,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
             castViewHolders[j++].bindData(cel);
         }
     }
+
     /**
      * 通过查询tag获得recommend数据
      */
@@ -465,11 +473,11 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
                         mRecommendTip.setClickable(true);
                     }
                 });
-        MyApplication.addRequest(request,mId);
+        MyApplication.addRequest(request, mId);
     }
 
     /**
-     * 用于保存filmContent和filmImage
+     * 用于保存filmContent
      * 将图片保存成文件,将电影id和Json 信息存入数据库
      */
     private void filmSave() {
@@ -477,8 +485,6 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(mFile);
-            Bitmap bitmap = imageLoader.loadImageSync(mSubject.getImages().getLarge());
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -498,6 +504,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         MyApplication.getDataSource().insertOrUpDataFilm(mId, content);
         Toast.makeText(this, "收藏成功!  (＾－＾)V", Toast.LENGTH_SHORT).show();
     }
+
     //删除本地 图片 和 数据库中的信息
     private void cancelSave() {
         //将数据从数据库中删除
@@ -506,6 +513,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         if (mFile.exists()) mFile.delete();
         Toast.makeText(this, "取消收藏!  ︿(￣︶￣)︿", Toast.LENGTH_SHORT).show();
     }
+
     //-------------------setEvent↓-------------------------------
     @Override
     public void onClick(View v) {
@@ -537,7 +545,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
                 sb.append(mSubject.getId());
                 sb.append("/cinema/dalian/");
 
-                WebActivity.toWebActivity(this, sb.toString() , mSubject.getTitle());
+                WebActivity.toWebActivity(this, sb.toString(), mSubject.getTitle());
                 break;
         }
     }
@@ -556,6 +564,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
             CelebrityActivity.toActivity(this, id);
         }
     }
+
     //菜单栏点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -579,6 +588,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         }
         return super.onOptionsItemSelected(item);
     }
+
     /**
      * AppBarLayout onOffsetChangeListener
      * AppBarLayout 垂直方向移动的时候
@@ -593,6 +603,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         changeContentLayout(alpha);//自定义的动画函数
     }
     //-------------------setEvent↑-------------------------------
+
     /**
      * 点击收藏后将subject存入数据库中,并将图片存入文件
      */
@@ -618,7 +629,8 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
         mIntroduceContainerParams.leftMargin = (int) (mImageWidth * alpha);
         mIntroduceContainer.setLayoutParams(mIntroduceContainerParams);
     }
-//当上滑滚动好了之后,重新设置 简介layout中各个小控件的位置
+
+    //当上滑滚动好了之后,重新设置 简介layout中各个小控件的位置
     private void setContentGravity(int gravity) {
         mIntroduceContainer.setGravity(gravity);
         mAke.setGravity(gravity);
@@ -650,7 +662,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
             mCastView.setOnClickListener(this);
 
             if (data.getAvatars() == null) return;
-            imageLoader.displayImage(data.getAvatars().getLarge(), mImage, options);
+            Picasso.with(getApplicationContext()).load(data.getAvatars().getLarge()).into(mImage);
         }
 
         void bindDataForDir(CelebrityEntity data, boolean isCast) {
@@ -665,7 +677,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
             mCastView.setOnClickListener(this);
 
             if (data.getAvatars() == null) return;
-            imageLoader.displayImage(data.getAvatars().getLarge(), mImage, options);
+            Picasso.with(getApplicationContext()).load(data.getAvatars().getLarge()).into(mImage);
         }
 
         @Override
@@ -674,7 +686,7 @@ public class SubjectActivity extends AppCompatActivity implements View.OnClickLi
                 if (mCastData.getId() == null) {
                     Toast.makeText(SubjectActivity.this, "暂无资料", Toast.LENGTH_SHORT).show();
                 } else {
-                    CelebrityActivity.toActivity( SubjectActivity.this, mCastData.getId());
+                    CelebrityActivity.toActivity(SubjectActivity.this, mCastData.getId());
                 }
             }
         }

@@ -24,14 +24,12 @@ import yuut.icinema.db.DataSource;
  */
 //管理全局的状态信息
 public class MyApplication extends Application {
-    private static DisplayImageOptions mLoaderOptions;
     private static RequestQueue mQueue; //volley消息队列
     private static DataSource mSource;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        initImageLoader(getApplicationContext());
         mQueue = Volley.newRequestQueue(getApplicationContext(), new OkHttpStack());
         mSource = new DataSource(getApplicationContext());
         try {
@@ -39,26 +37,6 @@ public class MyApplication extends Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void initImageLoader(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration
-                .Builder(context)
-                .denyCacheImageMultipleSizesInMemory()
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .diskCacheFileNameGenerator(new Md5FileNameGenerator())
-                .tasksProcessingOrder(QueueProcessingType.FIFO)
-                .build();
-        ImageLoader.getInstance().init(config);
-        mLoaderOptions = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.no_image)
-                .showImageOnFail(R.drawable.no_image)
-                .showImageForEmptyUri(R.drawable.no_image)
-                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .build();
     }
 
     public static DataSource getDataSource() {
@@ -69,9 +47,6 @@ public class MyApplication extends Application {
         return mQueue;
     }
 
-    public static DisplayImageOptions getLoaderOptions() {
-        return mLoaderOptions;
-    }
     //volley使用
     public static void addRequest(Request request, Object tag) {
         request.setTag(tag);

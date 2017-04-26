@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,6 @@ public class SimpleFilmAdapter extends RecyclerView.Adapter<SimpleFilmAdapter.Vi
     private Context mContext;
     private List<SimpleCardBean> mData = new ArrayList<>(); //推荐 海报+名字
     private OnItemClickListener callback; //SimpleFilmAdapter内定义
-
-    private ImageLoader imageLoader = ImageLoader.getInstance();
-    private DisplayImageOptions options = MyApplication.getLoaderOptions();
 
     public SimpleFilmAdapter(Context mContext) {
         this.mContext = mContext;
@@ -94,7 +92,8 @@ public class SimpleFilmAdapter extends RecyclerView.Adapter<SimpleFilmAdapter.Vi
         //将数据绑定在控件上
         public void update() {
             subj = mData.get(getLayoutPosition());
-            imageLoader.displayImage(subj.getImage(), image_film, options);
+            Picasso.with(mContext).load(subj.getImage()).into(image_film);
+//            imageLoader.displayImage(subj.getImage(), image_film, options);
             text_title.setText(subj.getName());
         }
     }
