@@ -17,12 +17,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.orhanobut.logger.Logger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import yuut.icinema.R;
+import yuut.icinema.app.MyApplication;
+import yuut.icinema.bean.UserBean;
 import yuut.icinema.support.Util.PhoneFormatCheckUtils;
 
 /**
@@ -73,44 +76,42 @@ public class LoginActivity extends BaseActivity {
                 ActivityOptionsCompat oc2 = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
 //                Intent i2 = new Intent(this, LoginSuccessActivity.class);
 //                startActivity(i2, oc2.toBundle());
-                String phone = usernameView.getText().toString();
+                String username = usernameView.getText().toString();
                 String password = passwordView.getText().toString();
-                if (TextUtils.isEmpty(phone)) {
-                    Toast.makeText(this,"请填E-mail",Toast.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(this,"请填写密码",Toast.LENGTH_SHORT).show();
-//                } else if (!PhoneFormatCheckUtils.isChinaPhoneLegal(phone)) {
-//                    Toast.makeText(this,"手机号码格式错误",Toast.LENGTH_SHORT).show();
-                } else {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-//                    SceneFactory.getSceneService().login(phone, password)
-//                            .subscribeOn(Schedulers.io())
-//                            .observeOn(AndroidSchedulers.mainThread())
-//                            .subscribe(new Subscriber<AnsEntity>() {
-//                                @Override
-//                                public void onCompleted() {
-//                                }
-//                                @Override
-//                                public void onError(Throwable e) {
-//                                    Logger.d(e.getMessage());
-//                                }
-//                                @Override
-//                                public void onNext(AnsEntity ansEntity) {
-//                                    if (ansEntity.isSuccess()) {
-//                                        SharePreUtil.saveIntData(LoginActivity.this, "userId", ansEntity.getUserId());
-//                                        EventBus.getDefault().post(new NeedReloadEvent());
-//                                        finish();
-//                                    } else {
-//                                        Toast.makeText(LoginActivity.this,"用户名或密码错误",Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }
-//                            });
+                if (TextUtils.isEmpty(username)) {
+                    Toast.makeText(this, "请填E-mail", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(this, "请填写密码", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                long queryNum = MyApplication.liteOrm.queryCount(new QueryBuilder<UserBean>(UserBean.class)
+                        .whereEquals("user_name", username));
+                if (queryNum <= 0) {
+                    Toast.makeText(this, "用户不存在请注册", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                queryNum = MyApplication.liteOrm.queryCount(new QueryBuilder<UserBean>(UserBean.class)
+                        .whereEquals("user_name", username)
+                        .whereAppendAnd()
+                        .whereEquals("password", password));
+                if (queryNum <= 0) {
+                    Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //成功通过验证
+                UserBean userBean = new UserBean();
+                userBean.setUser_name(username);
+                userBean.setPassword(password);
+
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;
         }
+
     }
 
     @Override

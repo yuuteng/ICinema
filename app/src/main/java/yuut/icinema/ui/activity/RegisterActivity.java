@@ -20,12 +20,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.orhanobut.logger.Logger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import yuut.icinema.R;
+import yuut.icinema.app.MyApplication;
+import yuut.icinema.bean.UserBean;
 import yuut.icinema.support.Util.PhoneFormatCheckUtils;
 
 /**
@@ -64,7 +67,6 @@ public class RegisterActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 animateRevealClose();
-                ;
             }
         });
     }
@@ -82,38 +84,26 @@ public class RegisterActivity extends BaseActivity {
             Toast.makeText(this, "请填写密码", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!PhoneFormatCheckUtils.isChinaPhoneLegal(username)) {
-            Toast.makeText(this, "手机号码格式错误", Toast.LENGTH_SHORT).show();
-            return;
-        }
         if (!password.equals(rePassword)) {
             Toast.makeText(this, "两次密码不一致", Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-//        SceneFactory.getSceneService().register(username, password)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(new Subscriber<AnsEntity>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Logger.d(e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(AnsEntity ansEntity) {
-//                        if (ansEntity.isSuccess()) {
-//                            SharePreUtil.saveIntData(RegisterActivity.this, "userId", ansEntity.getUserId());
-//                            finish();
-//                        }
-//                    }
-//                });
+
+        long queryNum = MyApplication.liteOrm.queryCount(new QueryBuilder<UserBean>(UserBean.class).whereEquals("user_name",username));
+        Logger.d(queryNum);
+        if (queryNum>0){
+            Toast.makeText(this, "该用户已存在", Toast.LENGTH_SHORT).show();
+        } else {
+            //存储新用户
+            UserBean user = new UserBean();
+            user.setUser_name(username);
+            user.setPassword(password);
+            MyApplication.liteOrm.save(user);
+            Toast.makeText(this, "Register successfully", Toast.LENGTH_SHORT).show();
+            //跳转页面
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
 

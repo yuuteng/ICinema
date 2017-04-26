@@ -7,6 +7,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.litesuits.orm.LiteOrm;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -27,6 +28,9 @@ public class MyApplication extends Application {
     private static RequestQueue mQueue; //volley消息队列
     private static DataSource mSource;
 
+    //LiteOrm
+    public static LiteOrm liteOrm;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,6 +41,12 @@ public class MyApplication extends Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        //LiteOrm
+        if (liteOrm == null) {
+            liteOrm = LiteOrm.newSingleInstance(this, "icinema.db");
+        }
+        liteOrm.setDebugged(true);//open the log
     }
 
     public static DataSource getDataSource() {
